@@ -3,43 +3,41 @@ from openai import OpenAI
 
 st.set_page_config(page_title="AI Tư Vấn Bán Hàng", layout="centered")
 
-st.title("🛒 AI Tư Vấn Bán Hàng")
-st.write("Nhập nhu cầu – AI sẽ gợi ý sản phẩm phù hợp")
+st.title("🛒 AI Tư Vấn Sản Phẩm Mẹ & Bé")
+st.write("Nhập nhu cầu – AI gợi ý sản phẩm phù hợp")
 
-# Nhập API key
 api_key = st.text_input("🔑 OpenAI API Key", type="password")
 if not api_key:
     st.stop()
 
 client = OpenAI(api_key=api_key)
 
-# Danh sách sản phẩm (bạn đổi sau)
 products = [
     {
-        "name": "Khăn quấn chũn cho bé",
+        "name": "Khăn quấn chũn cao cấp",
         "price": "320.000đ",
-        "desc": "Giúp bé ngủ ngon, hạn chế giật mình"
+        "desc": "Giúp bé ngủ sâu, hạn chế giật mình"
     },
     {
         "name": "Đệm chống trào ngược",
         "price": "890.000đ",
-        "desc": "Hỗ trợ tiêu hóa, giảm ọc sữa ban đêm"
+        "desc": "Giảm ọc sữa, hỗ trợ tiêu hóa"
     }
 ]
 
 need = st.text_area(
     "📌 Nhu cầu của bạn",
-    "Bé 2 tháng tuổi ngủ hay giật mình"
+    "Bé 2 tháng tuổi ngủ không sâu"
 )
 
-if st.button("🤖 AI tư vấn ngay"):
-    with st.spinner("AI đang phân tích..."):
+if st.button("🤖 AI tư vấn"):
+    with st.spinner("AI đang tư vấn..."):
         product_text = "\n".join(
             [f"- {p['name']} ({p['price']}): {p['desc']}" for p in products]
         )
 
         prompt = f"""
-        Bạn là chuyên gia tư vấn bán hàng trung thực.
+        Bạn là chuyên gia tư vấn mẹ và bé.
 
         Nhu cầu khách hàng:
         "{need}"
@@ -47,14 +45,15 @@ if st.button("🤖 AI tư vấn ngay"):
         Danh sách sản phẩm:
         {product_text}
 
-        Hãy gợi ý sản phẩm phù hợp, giải thích ngắn gọn, dễ hiểu,
-        kết thúc bằng lời mời liên hệ đặt hàng.
+        - Gợi ý 1–2 sản phẩm phù hợp
+        - Giải thích ngắn gọn
+        - Kết thúc bằng CTA đặt hàng
         """
 
         res = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Bạn là chuyên gia tư vấn bán hàng."},
+                {"role": "system", "content": "Bạn là chuyên gia tư vấn mẹ và bé tại Việt Nam."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -63,5 +62,10 @@ if st.button("🤖 AI tư vấn ngay"):
         st.write(res.choices[0].message.content)
 
         st.markdown("---")
-        st.markdown("📞 **Liên hệ đặt hàng:**")
-        st.markdown("👉 Zalo: **090xxxxxxx**")
+        st.markdown("### 📲 Đặt hàng ngay")
+        st.markdown(
+            "👉 **[Chat Zalo với shop](https://zalo.me/0937937504)**"
+        )
+        st.markdown(
+            "👉 **[Inbox Facebook](https://m.me/tenpage)**"
+        )
