@@ -1,71 +1,64 @@
 import streamlit as st
 from openai import OpenAI
 
-st.set_page_config(page_title="AI Tư Vấn Bán Hàng", layout="centered")
+st.set_page_config(page_title="AI Bán Hàng", layout="centered")
 
-st.title("🛒 AI Tư Vấn Sản Phẩm Mẹ & Bé")
-st.write("Nhập nhu cầu – AI gợi ý sản phẩm phù hợp")
+st.title("🤖 AI Tư Vấn Bán Hàng")
 
+# ===== THÔNG TIN SHOP =====
+shop_name = st.text_input("🏪 Tên shop", "Shop Mẹ & Bé ABC")
+zalo_link = st.text_input("📲 Link Zalo", "https://zalo.me/090XXXXXXX")
+fb_link = st.text_input("📘 Link Facebook", "https://m.me/tenpage")
+
+st.markdown("---")
+
+# ===== API KEY =====
 api_key = st.text_input("🔑 OpenAI API Key", type="password")
 if not api_key:
     st.stop()
 
 client = OpenAI(api_key=api_key)
 
-products = [
-    {
-        "name": "Khăn quấn chũn cao cấp",
-        "price": "320.000đ",
-        "desc": "Giúp bé ngủ sâu, hạn chế giật mình"
-    },
-    {
-        "name": "Đệm chống trào ngược",
-        "price": "890.000đ",
-        "desc": "Giảm ọc sữa, hỗ trợ tiêu hóa"
-    }
-]
+# ===== SẢN PHẨM =====
+products = st.text_area(
+    "📦 Danh sách sản phẩm (mỗi dòng 1 sản phẩm)",
+    """Khăn quấn chũn - 320.000đ - Giúp bé ngủ sâu
+Đệm chống trào ngược - 890.000đ - Giảm ọc sữa"""
+)
 
 need = st.text_area(
-    "📌 Nhu cầu của bạn",
+    "🧑‍🍼 Nhu cầu khách hàng",
     "Bé 2 tháng tuổi ngủ không sâu"
 )
 
 if st.button("🤖 AI tư vấn"):
     with st.spinner("AI đang tư vấn..."):
-        product_text = "\n".join(
-            [f"- {p['name']} ({p['price']}): {p['desc']}" for p in products]
-        )
-
         prompt = f"""
-        Bạn là chuyên gia tư vấn mẹ và bé.
+        Bạn là chuyên gia tư vấn bán hàng cho shop: {shop_name}
 
-        Nhu cầu khách hàng:
+        Nhu cầu khách:
         "{need}"
 
         Danh sách sản phẩm:
-        {product_text}
+        {products}
 
-        - Gợi ý 1–2 sản phẩm phù hợp
-        - Giải thích ngắn gọn
+        - Chọn sản phẩm phù hợp
+        - Giải thích dễ hiểu
+        - Văn phong bán hàng nhẹ nhàng
         - Kết thúc bằng CTA đặt hàng
         """
 
         res = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "Bạn là chuyên gia tư vấn mẹ và bé tại Việt Nam."},
+                {"role": "system", "content": "Bạn là AI bán hàng cho shop Việt Nam."},
                 {"role": "user", "content": prompt}
             ]
         )
 
-        st.subheader("💬 Gợi ý cho bạn")
+        st.subheader("💬 Tư vấn từ AI")
         st.write(res.choices[0].message.content)
 
-        st.markdown("---")
-        st.markdown("### 📲 Đặt hàng ngay")
-        st.markdown(
-            "👉 **[Chat Zalo với shop](https://zalo.me/0937937504)**"
-        )
-        st.markdown(
-            "👉 **[Inbox Facebook](https://m.me/tenpage)**"
-        )
+        st.markdown("### 📞 Đặt hàng")
+        st.markdown(f"👉 **[Chat Zalo]({zalo_link})**")
+        st.markdown(f"👉 **[Inbox Facebook]({fb_link})**")
